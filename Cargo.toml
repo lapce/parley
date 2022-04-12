@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 swash = { git = "https://github.com/dfrg/swash" }
-fount = { git = "https://github.com/dfrg/fount" }
+fount = { git = "https://github.com/lapce/fount" }
 
 [workspace]
 members = ["piet-parley"]
