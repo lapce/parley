@@ -132,6 +132,7 @@ impl ResolveContext {
             StyleProperty::LineHeight(value) => LineHeight(*value),
             StyleProperty::WordSpacing(value) => WordSpacing(*value * scale),
             StyleProperty::LetterSpacing(value) => LetterSpacing(*value * scale),
+            StyleProperty::TabWidth(value) => TabWidth(*value * scale),
         }
     }
 
@@ -301,6 +302,8 @@ pub enum ResolvedProperty<B: Brush> {
     WordSpacing(f32),
     /// Extra spacing between letters.
     LetterSpacing(f32),
+    /// Tab Width
+    TabWidth(f32),
 }
 
 /// Flattened group of style properties.
@@ -334,6 +337,8 @@ pub struct ResolvedStyle<B: Brush> {
     pub word_spacing: f32,
     /// Extra spacing between letters.
     pub letter_spacing: f32,
+    /// Maxium Tab width
+    pub tab_width: f32,
 }
 
 impl<B: Brush> Default for ResolvedStyle<B> {
@@ -353,6 +358,7 @@ impl<B: Brush> Default for ResolvedStyle<B> {
             line_height: 1.,
             word_spacing: 0.,
             letter_spacing: 0.,
+            tab_width: 0.,
         }
     }
 }
@@ -382,6 +388,7 @@ impl<B: Brush> ResolvedStyle<B> {
             LineHeight(value) => self.line_height = value,
             WordSpacing(value) => self.word_spacing = value,
             LetterSpacing(value) => self.letter_spacing = value,
+            TabWidth(value) => self.tab_width = value,
         }
     }
 
@@ -408,6 +415,7 @@ impl<B: Brush> ResolvedStyle<B> {
             LineHeight(value) => nearly_eq(self.line_height, *value),
             WordSpacing(value) => nearly_eq(self.word_spacing, *value),
             LetterSpacing(value) => nearly_eq(self.letter_spacing, *value),
+            TabWidth(value) => nearly_eq(self.tab_width, *value),
         }
     }
 }

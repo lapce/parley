@@ -52,4 +52,6 @@ pub enum StyleProperty<'a, B: Brush> {
     WordSpacing(f32),
     /// Extra spacing between letters.
     LetterSpacing(f32),
+    /// Tab width.
+    TabWidth(f32),
 }

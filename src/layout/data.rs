@@ -4,7 +4,7 @@ use crate::style::Brush;
 use crate::util::*;
 use core::ops::Range;
 use swash::shape::Shaper;
-use swash::text::cluster::{Boundary, ClusterInfo};
+use swash::text::cluster::{Boundary, ClusterInfo, Whitespace};
 use swash::Synthesis;
 
 #[derive(Copy, Clone)]
@@ -228,6 +228,7 @@ impl<B: Brush> LayoutData<B> {
         bidi_level: u8,
         word_spacing: f32,
         letter_spacing: f32,
+        tab_width: f32,
     ) {
         let font_index = self
             .fonts
@@ -306,7 +307,14 @@ impl<B: Brush> LayoutData<B> {
             }
             let text_len = source_range.len();
             let glyph_len = cluster.glyphs.len();
-            let advance = cluster.advance();
+            let mut advance = cluster.advance();
+            let is_tab = cluster.info.whitespace() == Whitespace::Tab;
+            if is_tab {
+                let mut before: f32 = self.runs.iter().map(|run| run.advance).sum();
+                before += run.advance;
+                let tab_width = if tab_width == 0.0 { 20.0 } else { tab_width };
+                advance = tab_width - before % tab_width;
+            }
             run.advance += advance;
             let mut cluster_data = ClusterData {
                 info: cluster.info,

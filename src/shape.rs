@@ -19,6 +19,7 @@ struct Item {
     features: Resolved<FontFeature>,
     word_spacing: f32,
     letter_spacing: f32,
+    tab_width: f32,
 }
 
 pub fn shape_text<B: Brush>(
@@ -49,6 +50,7 @@ pub fn shape_text<B: Brush>(
         features: style.font_features,
         word_spacing: style.word_spacing,
         letter_spacing: style.letter_spacing,
+        tab_width: style.tab_width,
     };
     let mut char_range = 0..0;
     let mut text_range = 0..0;
@@ -100,6 +102,7 @@ pub fn shape_text<B: Brush>(
                         item.level,
                         item.word_spacing,
                         item.letter_spacing,
+                        item.tab_width,
                     );
                 },
             );
