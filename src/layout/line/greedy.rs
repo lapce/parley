@@ -507,7 +507,10 @@ fn commit_line<B: Brush>(
     }
     let last_run = state.runs.len() - 1;
     let runs_start = lines.runs.len();
-    for (i, run_data) in layout.runs[state.runs.clone()].iter().enumerate() {
+    for (i, run_data) in layout.runs[state.runs.start..state.runs.end.min(layout.runs.len())]
+        .iter()
+        .enumerate()
+    {
         let run_index = state.runs.start + i;
         let mut cluster_range = run_data.cluster_range.clone();
         if i == 0 {

@@ -150,7 +150,7 @@ impl ResolveContext {
                         }
                         FontFamily::Generic(family) => {
                             self.tmp_families
-                                .extend_from_slice(fcx.cache.context.generic_families(family));
+                                .extend_from_slice(&fcx.cache.context.generic_families(family));
                         }
                     }
                 }
@@ -163,7 +163,7 @@ impl ResolveContext {
                 }
                 FontFamily::Generic(family) => {
                     self.tmp_families
-                        .extend_from_slice(fcx.cache.context.generic_families(family));
+                        .extend_from_slice(&fcx.cache.context.generic_families(family));
                 }
             },
             FontStack::List(families) => {
@@ -176,7 +176,7 @@ impl ResolveContext {
                         }
                         FontFamily::Generic(family) => {
                             self.tmp_families
-                                .extend_from_slice(fcx.cache.context.generic_families(*family));
+                                .extend_from_slice(&fcx.cache.context.generic_families(*family));
                         }
                     }
                 }
