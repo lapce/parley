@@ -106,6 +106,7 @@ impl<B: Brush> RcLayoutContext<B> {
         scale: f32,
     ) -> RangedBuilder<'static, B, T> {
         self.lcx.borrow_mut().begin(text.as_str());
+        fcx.borrow_mut().cache.reset();
         RangedBuilder {
             text,
             scale,
