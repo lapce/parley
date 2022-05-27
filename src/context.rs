@@ -199,9 +199,10 @@ impl<'a, B: Brush, T: TextSource> RangedBuilder<'a, B, T> {
         layout.data.finish();
         if is_empty {
             layout.data.text_len = 0;
-            let run = &mut layout.data.runs[0];
-            run.cluster_range.end = 0;
-            run.text_range.end = 0;
+            if let Some(run) = layout.data.runs.get_mut(0) {
+                run.cluster_range.end = 0;
+                run.text_range.end = 0;
+            }
             layout.data.clusters.clear();
         }
     }
