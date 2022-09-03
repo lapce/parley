@@ -66,6 +66,8 @@ pub struct LineMetrics {
     pub ascent: f32,
     /// Typographic descent.
     pub descent: f32,
+    /// Distance from the baseline to the top of a typical English capital.
+    pub cap_height: f32,
     /// Typographic leading.
     pub leading: f32,
     /// Offset to the baseline.

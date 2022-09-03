@@ -257,6 +257,7 @@ impl<B: Brush> LayoutData<B> {
             metrics: RunMetrics {
                 ascent: metrics.ascent,
                 descent: metrics.descent,
+                cap_height: metrics.cap_height,
                 leading: metrics.leading,
                 underline_offset: metrics.underline_offset,
                 underline_size: metrics.stroke_size,

@@ -289,6 +289,7 @@ impl<'a, B: Brush> BreakLines<'a, B> {
             let run_count = line.run_range.end - run_base;
             line.metrics.ascent = 0.;
             line.metrics.descent = 0.;
+            line.metrics.cap_height = 0.;
             line.metrics.leading = 0.;
             line.metrics.offset = 0.;
             let mut have_metrics = false;
@@ -312,6 +313,10 @@ impl<'a, B: Brush> BreakLines<'a, B> {
                 let run = &self.layout.runs[line_run.run_index];
                 line.metrics.ascent = line.metrics.ascent.max(run.metrics.ascent * line_height);
                 line.metrics.descent = line.metrics.descent.max(run.metrics.descent * line_height);
+                line.metrics.cap_height = line
+                    .metrics
+                    .cap_height
+                    .max(run.metrics.cap_height * line_height);
                 line.metrics.leading = line.metrics.leading.max(run.metrics.leading * line_height);
                 have_metrics = true;
             }
@@ -392,11 +397,13 @@ impl<'a, B: Brush> BreakLines<'a, B> {
                     let run = &self.layout.runs[line_run.run_index];
                     line.metrics.ascent = run.metrics.ascent;
                     line.metrics.descent = run.metrics.descent;
+                    line.metrics.cap_height = run.metrics.cap_height;
                     line.metrics.leading = run.metrics.leading;
                 }
             }
             line.metrics.ascent = line.metrics.ascent.round();
             line.metrics.descent = line.metrics.descent.round();
+            line.metrics.cap_height = line.metrics.cap_height.round();
             line.metrics.leading = (line.metrics.leading * 0.5).round() * 2.;
             let above = (line.metrics.ascent + line.metrics.leading * 0.5).round();
             let below = (line.metrics.descent + line.metrics.leading * 0.5).round();
