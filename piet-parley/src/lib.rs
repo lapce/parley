@@ -100,7 +100,7 @@ impl TextLayout for ParleyTextLayout {
 
 pub struct ParleyTextLayoutBuilder {
     text: ParleyTextStorage,
-    builder: RangedBuilder<'static, ParleyBrush, ParleyTextStorage>,
+    builder: RangedBuilder<ParleyBrush, ParleyTextStorage>,
     max_width: f64,
     alignment: layout::Alignment,
 }
@@ -151,7 +151,7 @@ impl TextLayoutBuilder for ParleyTextLayoutBuilder {
 #[derive(Clone)]
 pub struct ParleyText {
     fcx: Rc<RefCell<FontContext>>,
-    lcx: context::RcLayoutContext<ParleyBrush>,
+    lcx: context::LayoutContext<ParleyBrush>,
     scale: f32,
 }
 
@@ -163,7 +163,7 @@ impl ParleyText {
     pub fn with_font_context(fcx: FontContext) -> Self {
         Self {
             fcx: Rc::new(RefCell::new(fcx)),
-            lcx: context::RcLayoutContext::new(),
+            lcx: context::LayoutContext::new(),
             scale: 1.,
         }
     }
@@ -201,9 +201,7 @@ impl Text for ParleyText {
 
     fn new_text_layout(&mut self, text: impl TextStorage) -> Self::TextLayoutBuilder {
         let text = ParleyTextStorage(Rc::new(text));
-        let builder = self
-            .lcx
-            .ranged_builder(self.fcx.clone(), text.clone(), self.scale);
+        let builder = LayoutContext::builder(text.clone(), self.scale);
         let builder = ParleyTextLayoutBuilder {
             builder,
             text,

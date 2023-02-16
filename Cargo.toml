@@ -6,8 +6,9 @@ license = "MIT OR Apache-2.0"
 edition = "2018"
 
 [dependencies]
+once_cell = "1.17.1"
 swash = { git = "https://github.com/dfrg/swash" }
-fount = { git = "https://github.com/dfrg/fount" }
+fount = { git = "https://github.com/lapce/fount", rev = "0ac37ef400d4048e2dbebe34b1a74f55dab4654d" }
 
 [workspace]
 members = ["piet-parley"]

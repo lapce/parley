@@ -36,19 +36,15 @@ impl<B: Brush> LayoutContext<B> {
         }
     }
 
-    pub fn ranged_builder<'a>(
-        &'a mut self,
-        fcx: &'a mut FontContext,
-        text: &'a str,
-        scale: f32,
-    ) -> RangedBuilder<B, &'a str> {
-        self.begin(text);
-        fcx.cache.reset();
+    pub fn builder<T: TextSource>(text: T, scale: f32) -> RangedBuilder<B, T> {
+        let mut lcx = Self::new();
+        lcx.begin(text.as_str());
+        let fcx = FontContext::new();
         RangedBuilder {
             text,
             scale,
-            lcx: MaybeShared::Borrowed(self),
-            fcx: MaybeShared::Borrowed(fcx),
+            lcx,
+            fcx,
         }
     }
 
@@ -86,78 +82,42 @@ impl<B: Brush> Clone for LayoutContext<B> {
     }
 }
 
-#[doc(hidden)]
-#[derive(Clone)]
-pub struct RcLayoutContext<B: Brush> {
-    lcx: Rc<RefCell<LayoutContext<B>>>,
-}
-
-impl<B: Brush> RcLayoutContext<B> {
-    pub fn new() -> Self {
-        Self {
-            lcx: Rc::new(RefCell::new(LayoutContext::new())),
-        }
-    }
-
-    pub fn ranged_builder<T: TextSource>(
-        &mut self,
-        fcx: Rc<RefCell<FontContext>>,
-        text: T,
-        scale: f32,
-    ) -> RangedBuilder<'static, B, T> {
-        self.lcx.borrow_mut().begin(text.as_str());
-        RangedBuilder {
-            text,
-            scale,
-            lcx: MaybeShared::Shared(self.lcx.clone()),
-            fcx: MaybeShared::Shared(fcx),
-        }
-    }
-}
-
 /// Builder for constructing a text layout with ranged attributes.
-pub struct RangedBuilder<'a, B: Brush, T: TextSource> {
+pub struct RangedBuilder<B: Brush, T: TextSource> {
     text: T,
     scale: f32,
-    lcx: MaybeShared<'a, LayoutContext<B>>,
-    fcx: MaybeShared<'a, FontContext>,
+    lcx: LayoutContext<B>,
+    fcx: FontContext,
 }
 
-impl<'a, B: Brush, T: TextSource> RangedBuilder<'a, B, T> {
+impl<B: Brush, T: TextSource> RangedBuilder<B, T> {
     pub fn push_default(&mut self, property: &StyleProperty<B>) {
-        let mut lcx = self.lcx.borrow_mut();
-        let mut fcx = self.fcx.borrow_mut();
-        let resolved = lcx.rcx.resolve(&mut fcx, &property, self.scale);
-        lcx.rsb.push_default(resolved);
+        let resolved = self.lcx.rcx.resolve(&mut self.fcx, &property, self.scale);
+        self.lcx.rsb.push_default(resolved);
     }
 
     pub fn push(&mut self, property: &StyleProperty<B>, range: impl RangeBounds<usize>) {
-        let mut lcx = self.lcx.borrow_mut();
-        let mut fcx = self.fcx.borrow_mut();
-        let resolved = lcx.rcx.resolve(&mut fcx, &property, self.scale);
-        lcx.rsb.push(resolved, range);
+        let resolved = self.lcx.rcx.resolve(&mut self.fcx, &property, self.scale);
+        self.lcx.rsb.push(resolved, range);
     }
 
     pub fn build_into(&mut self, layout: &mut Layout<B>) {
         layout.data.clear();
         layout.data.scale = self.scale;
-        let mut lcx = self.lcx.borrow_mut();
-        let lcx = &mut *lcx;
         let mut text = self.text.as_str();
         let is_empty = text.is_empty();
         if is_empty {
             // Force a layout to have at least one line.
             text = " ";
         }
-        layout.data.has_bidi = !lcx.bidi.levels().is_empty();
-        layout.data.base_level = lcx.bidi.base_level();
+        layout.data.has_bidi = !self.lcx.bidi.levels().is_empty();
+        layout.data.base_level = self.lcx.bidi.base_level();
         layout.data.text_len = text.len();
-        let mut fcx = self.fcx.borrow_mut();
-        lcx.rsb.finish(&mut lcx.styles);
+        self.lcx.rsb.finish(&mut self.lcx.styles);
         let mut char_index = 0;
-        for (i, style) in lcx.styles.iter().enumerate() {
+        for (i, style) in self.lcx.styles.iter().enumerate() {
             for _ in text[style.range.clone()].chars() {
-                lcx.info[char_index].1 = i as u16;
+                self.lcx.info[char_index].1 = i as u16;
                 char_index += 1;
             }
         }
@@ -176,7 +136,7 @@ impl<'a, B: Brush, T: TextSource> RangedBuilder<'a, B, T> {
                 None
             }
         }
-        layout.data.styles.extend(lcx.styles.iter().map(|s| {
+        layout.data.styles.extend(self.lcx.styles.iter().map(|s| {
             let s = &s.style;
             Style {
                 brush: s.brush.clone(),
@@ -186,12 +146,12 @@ impl<'a, B: Brush, T: TextSource> RangedBuilder<'a, B, T> {
             }
         }));
         super::shape::shape_text(
-            &lcx.rcx,
-            &mut fcx,
-            &lcx.styles,
-            &lcx.info,
-            lcx.bidi.levels(),
-            &mut lcx.scx,
+            &self.lcx.rcx,
+            &mut self.fcx,
+            &self.lcx.styles,
+            &self.lcx.info,
+            self.lcx.bidi.levels(),
+            &mut self.lcx.scx,
             text,
             layout,
         );

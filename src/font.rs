@@ -1,11 +1,16 @@
 //! Font management.
 
 use fount::{FamilyId, FontData, FontId, GenericFamily, Library, Locale, SourceId};
+use once_cell::sync::Lazy;
 use std::collections::HashMap;
+use std::sync::Arc;
 use swash::proxy::CharmapProxy;
 use swash::text::cluster::*;
 use swash::text::Script;
 use swash::{Attributes, CacheKey, FontRef, Synthesis};
+
+static FOUNT_FONT_CONTEXT: Lazy<Arc<fount::FontContext>> =
+    Lazy::new(|| Arc::new(fount::FontContext::new(&Library::default())));
 
 // Make this configurable?
 const RETAINED_SOURCE_COUNT: usize = 12;
@@ -68,7 +73,7 @@ impl FontContext {
 
 #[derive(Clone)]
 pub(crate) struct FontCache {
-    pub context: fount::FontContext,
+    pub context: Arc<fount::FontContext>,
     sources: SourceCache,
     selected_params: Option<(usize, Attributes)>,
     selected_fonts: Vec<CachedFont>,
@@ -81,7 +86,7 @@ pub(crate) struct FontCache {
 impl FontCache {
     pub fn new() -> Self {
         Self {
-            context: fount::FontContext::new(&Library::default()),
+            context: FOUNT_FONT_CONTEXT.clone(),
             sources: SourceCache::default(),
             selected_params: None,
             selected_fonts: vec![],
