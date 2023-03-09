@@ -18,9 +18,9 @@ const RETAINED_SOURCE_COUNT: usize = 12;
 /// Shared handle to a font.
 #[derive(Clone)]
 pub struct Font {
-    data: FontData,
-    offset: u32,
-    key: CacheKey,
+    pub data: FontData,
+    pub offset: u32,
+    pub key: CacheKey,
 }
 
 impl Font {

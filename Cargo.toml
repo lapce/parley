@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 once_cell = "1.17.1"
 swash = { git = "https://github.com/dfrg/swash" }
-fount = { git = "https://github.com/lapce/fount", rev = "0ac37ef400d4048e2dbebe34b1a74f55dab4654d" }
+fount = { git = "https://github.com/lapce/fount", rev = "7952647649c119be454691764c20768330a6e8f2" }
 
 [workspace]
 members = ["piet-parley"]
